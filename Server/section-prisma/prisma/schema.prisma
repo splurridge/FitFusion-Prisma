@@ -1,0 +1,79 @@
+// Prisma schema
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Admin {
+  admin_id       Int     @id @default(autoincrement())
+  admin_email    String  @unique
+  admin_password String
+}
+
+model EnrolledPlan {
+  enrollment_id Int     @id @default(autoincrement())
+  user_id       Int
+  plan_id       Int
+  User          User    @relation(fields: [user_id], references: [user_id])
+  Plan          Plan    @relation(fields: [plan_id], references: [plan_id])
+}
+
+model Plan {
+  plan_id         Int             @id @default(autoincrement())
+  plan_name       String
+  plan_category   Category
+  plan_total_day  Int?
+  plan_total_minute Int?
+  workouts        Workout[]
+  enrolledPlans   EnrolledPlan[] 
+}
+
+model User {
+  user_id       Int      @id @default(autoincrement())
+  user_name     String
+  user_email    String   @unique
+  user_password String
+  user_height   Float
+  user_weight   Float
+  enrolledPlans EnrolledPlan[]
+}
+
+model Workout {
+  workout_id           Int       @id @default(autoincrement())
+  plan_id              Int
+  workout_name         String
+  workout_description  String?
+  workout_minute       Int?
+  workout_set          Int?
+  workout_rep          Int?
+  workout_day           Day?
+  status               Status?
+  plan                 Plan      @relation(fields: [plan_id], references: [plan_id])
+}
+
+enum Category {
+  Cardio
+  Strength
+  Flexibility
+}
+
+enum Day {
+  Day1
+  Day2
+  Day3
+  Day4
+  Day5
+  Day6
+  Day7
+}
+
+enum Status {
+  Finished
+  Skipped
+  Pending
+}
